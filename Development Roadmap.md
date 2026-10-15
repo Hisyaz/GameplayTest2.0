@@ -163,233 +163,477 @@ Align all 7 Special / Continental Dream Teams with their official historical ros
 
 ---
 
-## Phase 2: Live Player Rating System (SofaScore Model) & End-Game MVP Engine [NEXT IMMEDIATE PRIORITY]
-*Priority: Zero-Allocation Live Rating Calculation & Performance Analytics*  
-*Daily Token Budget Profile: Scope: `src/game/playerRatings.ts`, `src/game/engine.ts`, `src/components/PitchCanvas.tsx`, `src/components/EndGameModal.tsx` | Target: ~750k tokens (1 Day's Quota)*
 
-### 2.1 Live Player Rating Engine & In-Game Floating Badge
-- **Lightweight Zero-Allocation Architecture**:
-  - Pre-allocated rating state array to maintain silky 60 FPS on budget smartphones.
-  - Every player on the pitch begins with a baseline rating of **6.0**.
-- **HUD Live Display**:
-  - Displays the current human-controlled player's live rating badge on the **bottom-right corner** (anchored just above the virtual controller if active).
-  - Dynamic color-coding: Red (<6.0), Yellow/Orange (6.0–6.9), Green (7.0–7.9), Cyan/Blue (8.0–8.9), Gold Star (9.0–10.0).
+## Phase 2: Startup Flow Overhaul, Captain Menu, Difficulty Tiers & Game Plan Load Fix
+*Priority: Correct Entry Point, 32-Bit Captain Hub, Difficulty Scaling Foundation, Critical Bug Fix*  
+*Daily Token Budget Profile: Scope: `src/App.tsx`, `src/components/TeamSelectorModal.tsx`, `src/components/PreMatchPresentationModal.tsx`, `src/components/TacticalGamePlanModal.tsx`, `src/game/ai.ts`, difficulty settings in UnifiedSettingsModal | Target: ~700–800k tokens (1 Day's Quota)*
 
-### 2.2 SofaScore-Grounded Algorithmic Actions Matrix
-- **Positive Impact Actions**:
-  - Successful dribble / duel won (+0.1 to +0.2).
-  - Successful short pass (+0.05).
-  - Successful cross (+0.15).
-  - Successful long pass (+0.20; rewarded higher than short pass or standard cross).
-  - Shot on goal (+0.15 to +0.25 based on xG).
-  - Key pass / assist (+0.4 to +0.7).
-  - Goal scored (+1.0 to +1.2).
-  - Successful standing tackle (+0.15).
-  - Successful sliding tackle (+0.25; sliding tackles rewarded higher due to risk).
-  - Interception / clearance (+0.1 to +0.15).
-  - Goalkeeper save (+0.3 to +0.6 based on shot speed and danger).
-- **Negative Impact Actions**:
-  - Missed pass (-0.1 to -0.15; missed long pass penalizes slightly less than missed simple short pass).
-  - Shot off target (-0.15).
-  - Turnover leading to opponent shot (-0.3).
-  - Turnover directly leading to opponent goal (-0.8).
-  - Committing an ordinary foul (-0.15).
-  - Committing a penalty kick foul (-0.5).
-  - Receiving a yellow card (-0.3).
-  - Receiving a red card (-1.2).
-  - Own goal (-1.5).
-  - Conceding a goal (-0.3 penalty applied to defenders, goalkeepers, CDMs, and wingbacks).
+### 2.1 Correct Application Entry Sequence
+- Application **must** start at **Team Selector** (never jump straight into a live match).
+- After both teams are confirmed → transition into the **Captain Presentation Menu**.
+- Remove every remaining "PES" / "Pro Evolution" string or stylistic reference from UI copy, comments, and asset labels.
 
-### 2.3 Subbed-Out Freezing & End-Game Ratings Board
-- If a player is substituted out, their rating is immediately **frozen** for the remainder of the match.
-- **End-Game Ratings Tab**:
-  - Full breakdown of both teams listing all starting players and substitutes who entered the match.
-  - **Match MVP Award**: Highest-rated player is crowned Match MVP with a gold star badge and highlighted card presentation.
+### 2.2 32-Bit Captain Presentation Menu (Mobile-First, Zero-Scroll)
+- Layout rules (strict single-screen, no scrolling):
+  - Local team captain + kit on the **left**.
+  - Away team captain + kit on the **right**.
+  - On vertical mobile: show **only the local team**; add a top-right button `[ VIEW OTHER TEAM ]` that swaps the entire panel to the away side (uniform, tactics summary, stadium name).
+  - On horizontal / desktop: both sides visible simultaneously.
+- Bottom button row (single horizontal line, equally spaced, tactile 32-bit bevels):
+  - `[ UNIFORM ]` | `[ TACTICS ]` | **`[ START ]`** (larger, centred) | `[ STADIUM ]` | `[ SETTINGS ]`
+- Each button opens a dedicated, self-contained console-style sub-panel (no nested scrolling).
+- START launches the match with currently selected teams, formations, playstyles, stadium and difficulty.
 
----
+### 2.3 Five Difficulty Tiers (AI Effectiveness Scaling)
+Add to Settings (and persist):
+1. **Standing** – AI almost stationary, very slow reactions, high error rate (tutorial / casual).
+2. **Easy** – Current baseline behaviour with relaxed decision timers.
+3. **Normal** – Solid modern decisions, reasonable compactness, occasional mistakes.
+4. **Elite** – Tight shape, aggressive but clean pressing, rare mistakes; only high-rated players consistently outplay them.
+5. **Legend** – Near-perfect positioning, anticipation and decision-making; player must play almost perfectly to win.
 
-## Phase 3: IFAB Autonomous Assistant Referee (Linesman Offside Engine) & VideoRef (VIR / VAR)
-*Priority: Flawless Offside Geometry, Autonomous Linesman & VAR Replay Interventions*  
-*Daily Token Budget Profile: Scope: `src/game/matchRules.ts`, `src/game/engine.ts`, `src/components/PitchCanvas.tsx`, `src/types.ts` | Target: ~800k tokens (1 Day's Quota)*
+Difficulty multiplies:
+- AI reaction delay
+- Cover-shadow tightness
+- Pass error probability (still gated by player stats)
+- Press intensity and recovery run commitment
+- GK decision quality
 
-### 3.1 Strict IFAB Law 11 Autonomous Offside Engine
-- **Raycasted Offside Detection**:
-  - Calculated at the exact millisecond the ball leaves the passer's foot.
-  - Receiver must have at least **two opposing players** (typically the goalkeeper and last outfield defender, or two outfielders) between them and the opposing goal line.
-- **Official IFAB Exceptions Strictly Modeled**:
-  1. Receiving player is in their own half (at or behind the halfway line).
-  2. Receiving player is level with or behind the ball when the pass is struck.
-  3. Receiving player receives ball directly from a **Throw-In**, **Corner Kick**, or **Goal Kick**.
-- **Interactive Animated Sideline Assistant Referee**:
-  - Procedural linesman sprite sprinting along the touchline following the last defender line.
-  - When offside occurs: Linesman halts, raises yellow-and-red checkered flag vertically, and signals the whistle.
-
-### 3.2 VideoRef (VIR / VAR) Autonomous Review System
-- **Match Settings Toggle**: Configurable in Match Settings (`VideoRef: ON / OFF`).
-- **All-Seeing Review Engine**:
-  - VIR monitors all penalty box incidents, red card offenses, and contested offside goals.
-  - If on-field referee overlooks a red card foul, penalty foul, or offside goal:
-    - Game briefly pauses with a retro 32-bit "VIR REVIEW IN PROGRESS" overlay.
-    - Referee walks to the pitchside monitor, reviews a brief procedural slow-mo replay, and reverses the decision to award the correct penalty, red card, or offside free kick.
+### 2.4 Critical Fix – Tactical Game Plan Modal Not Loading
+- Diagnose and resolve the current failure to open / render `TacticalGamePlanModal`.
+- Guaranteed props safety: defensive defaults for every formation, playstyle, tactics and roles object so the modal never crashes on missing data.
+- Ensure `isOpen` transition, team cloning and tab state reset work on both pre-match and mid-match entry points.
+- Verify zero-scroll pitch board still fits after the fix.
 
 ---
 
-## Phase 4: Lightweight Cinematics Suite & Skip-able Slow-Motion Replay Engine
-*Priority: Match Atmosphere, Celebration Cutscenes & Action Replay Loop*  
-*Daily Token Budget Profile: Scope: `src/game/replayEngine.ts`, `src/components/CinematicOverlay.tsx`, `src/game/stadiumRenderer.ts` | Target: ~750k tokens (1 Day's Quota)*
+## Phase 3: Goalkeeper Mechanical Mastery & Dual Control / AI Symmetry
+*Priority: Full GK Control Scheme + Identical AI Logic*  
+*Daily Token Budget Profile: Scope: `src/game/ai.ts`, `src/game/engine.ts`, `src/game/sprites.ts`, controller mapping | Target: ~750k tokens*
 
-### 4.1 Low-Overhead Procedural Cinematics Engine
-- **Settings Toggle**: Enable/disable cinematics in Settings (`Cinematics: ON / OFF`) for ultimate performance on ultra-budget devices.
-- **Atmospheric 32-Bit Cutscenes**:
-  - Match walkout tunnel entrance.
-  - Goal celebration cutscenes with team huddles and signature fist pumps.
-  - Dramatic referee card presentations (yellow / straight red card).
-  - Violent or dirty tackle reactions with referee warnings.
-  - Post-match emotional cutscenes (celebrations, fallen players, handshakes).
+### 3.1 Human Goalkeeper Control Mapping (Ball State Aware)
+- **Without ball**:
+  - Short Pass → sprint full speed toward the ball.
+  - Long Pass → spread / star shape to occupy maximum 1v1 blocking space.
+  - Cross → high dive / jump in stick direction, aiming top corners, opposite-hand reach.
+  - Shoot → low dive aiming bottom corner.
+  - No input after opponent shot → automatic dive (medium height/power).
+  - Ball Shield (Q) → high jump to catch (corners / crosses).
+  - Special (E) → punch clear instead of catch.
+- **With ball**: behaves exactly like an outfield player (same pass / clear / throw options).
 
-### 4.2 Circular Frame-Buffer Slow-Motion Replay System
-- **Zero-Allocation Circular Ring Buffer**:
-  - Constantly records the past 300 game state frames (~5 seconds of ball & player coordinates) with zero heap allocation.
-- **Automatic Replay Triggers**:
-  - Goal scored (plays slow-motion replay of strike and net ripple following celebration).
-  - Crucial fouls leading to direct free kicks or penalty kicks.
-  - Contested offside calls.
-- **Instant Skip Constitution**:
-  - Any button press (`Space`, `Enter`, touch tap, gamepad button) instantly skips the replay and restores active match play.
-  - Can be completely toggled off in Graphics Settings (`Replay System: ON / OFF`).
+### 3.2 AI Goalkeeper Uses Identical Decision Tree
+- AI GK evaluates the same action set under the same conditions.
+- Catch vs Punch decision driven by ball power, curve, and Handling / Reflexes attributes.
+- 1v1 star-spread, high/low dives and recovery positioning scale with difficulty tier.
 
----
-
-## Phase 5: Goalkeeper Mechanical Mastery & Dual Control/AI Architecture
-*Priority: Complete User & AI Goalkeeper Mechanics*  
-*Daily Token Budget Profile: Scope: `src/game/engine.ts`, `src/game/ai.ts`, `src/game/sprites.ts` | Target: ~750k tokens (1 Day's Quota)*
-
-### 5.1 Symmetrical AI Goalkeeper Intelligence
-- AI goalkeepers utilize the exact same mechanical decision tree as the player-controlled GK:
-  - 1v1 breakaway $\rightarrow$ dynamic choice between rushing out to sweep vs. executing a star spread block based on attacker distance.
-  - Reading incoming shot trajectory $Z$-elevation and angle to trigger high exchanged-hand fingertip parries vs. low turf smothers.
-  - Evaluating whether to attempt a two-handed catch (`Q`) or a two-fist punch (`E`) based on shot velocity, knuckle wobble, and aerial congestion.
-
-### 5.2 Catch-Slip vs. Punch Physics
-- Model ball handling friction: shots exceeding 24 px/frame velocity or bearing $>4.5$ Magnus curve risk slipping through the goalkeeper's gloves if a catch is attempted, resulting in dangerous rebounds.
-- Punch clears (`E`) guarantee ball safety at the cost of giving away a throw-in, corner, or long rebound.
-
-### 5.3 Procedural Goalkeeper Animation Enhancements
-- Dedicated 32-bit sprite frames for:
-  - Star spread stance with extended arms and splayed legs.
-  - High fingertip leap with trailing hand reach.
-  - Low lateral dive with tucked chin and body roll recovery.
-  - Two-fisted punch in mid-air.
+### 3.3 Procedural GK Sprite & Animation Hooks
+- Lightweight procedural frames for dive, star-spread, catch, punch, distribution.
+- No heavy sprite sheets; keep memory footprint mobile-safe.
 
 ---
 
-## Phase 6: Modern Compact Tactical Positioning & 5-Tier AI Intelligence Engine
-*Priority: AI Team Intelligence, Modern Compactness & Passing Overhaul*  
-*Daily Token Budget Profile: Scope: `src/game/ai.ts`, `src/game/tactics.ts`, `src/game/formations.ts` | Target: ~800k tokens (1 Day's Quota)*
+## Phase 4: Modern Compact Positioning Foundation (AI Core – Part 1)
+*Priority: 2026 Compactness, Block Height, Shape Maintenance*  
+*Daily Token Budget Profile: Scope: `src/game/ai.ts`, `src/game/tactics.ts`, `src/game/formations.ts`, `src/game/pitchGrid.ts` | Target: ~800k tokens*
 
-### 6.1 Modern Vertical Compactness (Short Team Structure)
-- Modern teams stay compact from the first attacker to the last defender ($28\text{m}–35\text{m}$ total vertical spread):
-  - **High Press Phase**: Defensive backline pushes up toward the halfway circle, squeezing midfield space.
-  - **Low Block Phase**: Attackers drop into their own half to support defensive shape rather than standing idle.
-- Synchronized block shifting: entire squad moves as an integrated unit relative to the ball position.
+**Research grounding (2026 tactics)**: Teams keep vertical distance between the highest attacker and deepest defender typically 25–35 m. Mid-block is the default recovery shape. High press is selective and short; low block is used deliberately. Entire unit shifts together.
 
-### 6.2 Line Intermingling & Positional Fluidity
-- Forwards actively contest and shadow opponent center backs.
-- Midfield units interlock and contest central lanes rather than adhering to rigid horizontal bands.
-- Fullbacks tuck into half-spaces or overlap depending on assigned tactical playstyle.
+### 4.1 Vertical Compactness Engine
+- Target vertical span (first attacker → last defender) clamped to 25–35 m depending on tactical playstyle and current phase of play.
+- High-press phase: back line pushes higher; attackers stay connected.
+- Mid-block phase: default recovery shape, compact central corridor.
+- Low-block phase: attackers drop deeper to protect the box; no idle high strikers.
 
-### 6.3 Elimination of Repetitive Defensive Back-Passes & High-Press Pressure
-- AI defenders will no longer engage in endless 20-pass loops between two center backs.
-- If pressured by 1 or 2 oncoming opponents, defenders execute forward passes to midfield pockets, cross-field switches, or emergency clearances.
+### 4.2 Synchronised Block Movement
+- Entire team treated as a single elastic unit relative to ball X/Y.
+- When the block shifts left/right or up/down, every line (defence, midfield, attack) moves together while preserving relative spacing.
+- Difficulty scales how tightly and how quickly the block re-forms after a transition.
 
-### 6.4 Attribute-Grounded Passing Accuracy & Difficulty Execution
-- Passing errors occur strictly as a function of canonical player stats (`SPA`, `LPA`, `CMP`) and pressure modifiers.
-- 5 Difficulty tiers strictly calibrate reaction delay, cover shadow tightness, and error rates.
+### 4.3 Rest-Defence & Transition Safety
+- Always leave a minimum number of players behind the ball (rest defence) based on formation and playstyle.
+- After losing possession, counter-press trigger window (first 3–5 seconds) is intensity-scaled by difficulty and tactical instructions.
 
----
-
-## Phase 7: Extended Ball Flight, Cross-Field Switch & Clean Defensive Tackling AI
-*Priority: Ball Flight Realism & Clean Defensive AI*  
-*Daily Token Budget Profile: Scope: `src/game/ballPhysics.ts`, `src/game/engine.ts`, `src/game/ai.ts` | Target: ~700k tokens (1 Day's Quota)*
-
-### 7.1 True Long-Range Ball Flight Physics
-- Aerodynamic drag curve allowing 80%–94% power shots from 3/4 pitch to hit the crossbar or corners with authentic pace.
-- Distance-based accuracy penalties: precision is harder from 40 yards, but velocity remains lethal.
-
-### 7.2 Automated "Cambio de Frente" Recognition
-- When crossing across pitch width with high power, the engine applies flat trajectory physics and leading forward vector, allowing wing-to-wing switches to arrive cleanly at the opposite winger's stride.
-
-### 7.3 Clean AI Tackling & Foul Calibration
-- AI defenders prioritize standing tackles and clean toe-pokes when positioned favorably.
-- Sliding tackles are restricted to desperate last-ditch blocks or specific aggressive philosophies.
-- Clean tackle win rate scales with `TCK` and `SLD` canonical attributes; fouls only occur on late lunges or tackles from behind.
+### 4.4 Direct Implementation Notes (Token-Efficient)
+- Extend existing role / sub-position system; do not rewrite formation data.
+- Use pre-allocated target-position buffers; zero new allocations per frame.
+- Expose a single `updateTeamBlockShape(team, ball, phase, difficulty)` entry point.
 
 ---
 
-## Phase 8: Procedural Dribbling Animation Tiers, Acceleration & Ginga Revamp
-*Priority: Fluid On-Ball Locomotion & Skill Progression*  
-*Daily Token Budget Profile: Scope: `src/game/animationEngine.ts`, `src/game/sprites.ts`, `src/game/ginga.ts` | Target: ~800k tokens (1 Day's Quota)*
+## Phase 5: Advanced AI Positioning, Line Intermingling & Role Fluidity (AI Core – Part 2)
+*Priority: Realistic Occupation of Space, Modern Interlocking Lines*  
+*Daily Token Budget Profile: Scope: `src/game/ai.ts`, `src/game/tactics.ts`, `src/game/formations.ts` | Target: ~800k tokens*
 
-### 8.1 6-Tier Dribbling Animation Architecture
-- Dribbling animations dynamically scale across 6 canonical skill brackets (Amateur 40–59, Semi-Pro 60–69, Pro 70–79, Elite 80–89, World Class 90–99, Stat Break 100+).
+### 5.1 Line Intermingling Rules
+- Forwards actively occupy and shadow opposition centre-backs / defensive midfielders (not stuck on their own half).
+- Midfield line interlocks with both the defensive and attacking thirds according to playstyle (e.g. box-to-box vs holding).
+- Full-backs / wing-backs tuck inside or push high based on tactical instructions and ball location.
 
-### 8.2 On-Ball Acceleration vs. Top Sprint Speed
-- Top sprint speed is determined by Pace (`PAC`).
-- On-ball acceleration and turn sharpness are governed directly by Dribbling (`DRI`) and Ball Control (`BCL`).
+### 5.2 Positional Roles Drive Off-Ball Behaviour
+- Every AI player continuously evaluates its assigned Primary Role + Sub-Position + Playstyle to decide:
+  - Support run type (underlap, overlap, blind-side, drop into pocket)
+  - Cover shadow target
+  - When to step out vs hold the line
+- Higher Positioning / Reactions attributes = earlier, more accurate arrival at the optimal spot.
 
-### 8.3 Ginga Mechanics Revamp
-- Ginga requires both $70+$ Ball Control and $70+$ Dribbling to execute cleanly; awkward stumbles below 70; lightning evasion at $90+$.
+### 5.3 Difficulty-Scaled Anticipation
+- Standing / Easy: delayed reaction, larger positioning errors.
+- Normal: solid modern shape.
+- Elite / Legend: near-perfect reading of ball trajectory and opponent intention; only the very best human play consistently beats them.
 
----
-
-## Phase 9: Aerial Anticipation, Dynamic Headers, Volleys & Deflection Reflexes Engine
-*Priority: Aerial Ball Physics, Drop-Zone Reading & Acrobatic Strikes*  
-*Daily Token Budget Profile: Scope: `src/game/ballPhysics.ts`, `src/game/ai.ts`, `src/game/sprites.ts` | Target: ~750k tokens (1 Day's Quota)*
-
-### 9.1 Trajectory Drop-Zone Anticipation
-- Players calculate projected landing coordinates $(x, y, t)$ of airborne balls governed by Positioning (`POS`) and Interceptions (`INT`).
-
-### 9.2 Goalmouth Deflection & Rebound Reflexes
-- Rebound reaction delay governed directly by Reactions (`REA`) and Reflexes (`REF`). High-reflex players react in sub-120ms.
-
-### 9.3 Acrobatic Aerial Strikes
-- Procedural animations for bullet headers, diving headers, chest-traps, side volleys, and bicycle clearances.
+### 5.4 Implementation Guardrails
+- Re-use existing `evaluatePlayerRoleFit` and pitch-grid helpers.
+- Keep all calculation inside the already zero-allocation AI tick.
+- Unit-test compactness and intermingling distances on a few canonical formations (4-3-3, 4-2-3-1, 3-5-2, 5-3-2).
 
 ---
 
-## Phase 10: Deep Modular Stadium Creator Architecture & Engine Preview
-*Priority: Stadium Customizer, Architectural Lighting & Team Identity*  
-*Daily Token Budget Profile: Scope: `src/components/StadiumCreatorModal.tsx`, `src/game/stadiumRenderer.ts`, `src/game/turfPhysics.ts` | Target: ~850k tokens (1 Day's Quota)*
+## Phase 6: AI Decision Quality, Passing Logic, Clean Defending & Anti-Spam
+*Priority: Intelligent Choices, Stat-Grounded Errors, Modern Pressing Intensity*  
+*Daily Token Budget Profile: Scope: `src/game/ai.ts`, `src/game/ballPhysics.ts`, `src/game/engine.ts` | Target: ~750–800k tokens*
 
-### 10.1 Low-Weight Architectural Constitution for Stadium Creation
-- Procedural Canvas 2D Vector Geometry (zero 3D meshes, zero bulky texture files).
-- Pre-baked seat & lawn pattern buffers on off-screen canvases.
-- Dynamic gradient shadow masks for circular/geometric roof shading.
+### 6.1 Decision-Making Hierarchy
+- AI chooses the highest-value available action under pressure:
+  1. Safe progressive pass into free pocket
+  2. Cross-field switch when wing is overloaded
+  3. Controlled clearance only when no progressive option exists
+- Eliminate the current “20 back-passes between two CBs” loop. Under pressure the AI must play forward or switch.
 
-### 10.2 The 4 Stadium Architectural Types
-- Round (Estadio Olímpico / Maracaná with athletic running track option).
-- Square (8-stand modern arena).
-- Rectangular (European football heritage).
-- Oval (curved touchline elongation).
+### 6.2 Pass / Cross / Shot Accuracy Strictly Stat-Driven
+- Miss probability is a function of Short Pass / Long Pass / Crossing / Shooting attributes + pressure + fatigue + difficulty multiplier.
+- A 90-rated passer under light pressure almost never misses a simple pass; a 45-rated player under high press frequently does.
+- Long-range power shots and switches travel the full required distance (see Phase 7); distance only reduces aiming precision, not velocity.
 
-### 10.3 Stand Customization & Team-to-Stadium Binding
-- 1–4 tier stacking + single massive Wall Stand (Dortmund Yellow Wall inspired).
-- Custom fan text banners, LED sponsors, crowd colors, pitch mowing designs.
+### 6.3 Clean Tackling & Foul Calibration
+- Good defenders (high Tackling + Positioning) preferentially use standing tackles and toe-pokes.
+- Sliding tackles reserved for last-ditch or specific aggressive philosophies.
+- Fouls become rare on Elite/Legend; more common only on low-defending-stat players or when the tactical instruction is ultra-aggressive.
+
+### 6.4 Modern Pressing Intensity
+- Every opponent in possession should feel 1–2 markers within realistic distance (modern “always under pressure” principle).
+- Press triggers and recovery runs scale with difficulty and the team’s chosen playstyle (High Press vs Mid Block vs Low Block).
 
 ---
 
-## Master Development Execution Order
+## Phase 7: True Long-Range Ball Flight, Cambio de Frente & Physics Polish
+*Priority: Authentic Trajectory Distance & Cross-Field Switches*  
+*Daily Token Budget Profile: Scope: `src/game/ballPhysics.ts`, `src/game/engine.ts` | Target: ~650–750k tokens*
 
-| Phase | Milestone | Focus Area | Deliverables & Playable State |
+### 7.1 Extended Flight Curve
+- 80–95 % power shots / long passes from three-quarter pitch must reach the penalty area / goal with remaining pace.
+- Aerodynamic drag is realistic; distance makes aiming harder, it does not kill velocity.
+
+### 7.2 Automatic “Cambio de Frente” (Switch of Play)
+- High-power cross aimed from one wing toward the opposite flank is interpreted as a flat switch.
+- Ball receives appropriate leading vector so the receiving winger can take it in stride.
+
+### 7.3 Consistency with Existing Chip / Driven / Swerve Modifiers
+- Preserve the current E / Q modifier suite; only extend the base trajectory tables.
+
+---
+
+## Phase 8: Procedural Dribbling Animation Tiers, On-Ball Acceleration & Ginga
+*Priority: Fluid On-Ball Locomotion, Skill Differentiation*  
+*Daily Token Budget Profile: Scope: `src/game/animationEngine.ts`, `src/game/sprites.ts`, `src/game/ginga.ts` | Target: ~750–850k tokens*
+
+### 8.1 Six Dribbling Animation Tiers
+| Attribute Band | Tier Name          | Animation Character                     |
+|----------------|--------------------|-----------------------------------------|
+| 40–59          | Amateur            | Heavy, upright, slow turns              |
+| 60–69          | Semi-Pro           | Basic close control                     |
+| 70–79          | Pro                | Sharper cuts, better body feints        |
+| 80–89          | Elite              | Quick step-overs, rapid direction change|
+| 90–99          | World Class        | Fluid, low centre of gravity, explosive |
+| 100+ (Stat Break) | Unique           | Signature / exaggerated elite moves     |
+
+### 8.2 On-Ball Physics Separation
+- Top speed still governed by Pace.
+- Acceleration while on the ball and turn radius governed by Dribbling + Ball Control.
+- Higher tiers unlock faster, cleaner animations for step-overs and skill moves.
+
+### 8.3 Ginga Thresholds
+- Effective only with Ball Control ≥ 70 **and** Dribbling ≥ 70.
+- At 90+ on both attributes it becomes highly reliable.
+- Below threshold: high failure / loss-of-possession chance.
+
+### 8.4 Supporting Animations
+- Lightweight procedural improvements for standing tackle, sliding tackle, shooting follow-through (no heavy new sprite sheets).
+
+---
+
+## Phase 9: Aerial Anticipation, Headers, Volleys & Rebound Reflexes
+*Priority: Reading Flight Paths & Winning the Second Ball*  
+*Daily Token Budget Profile: Scope: `src/game/ai.ts`, `src/game/ballPhysics.ts`, `src/game/animationEngine.ts` | Target: ~700–800k tokens*
+
+### 9.1 Drop-Zone Prediction
+- AI calculates expected landing zone of aerial balls.
+- Positioning attribute determines how early the player starts moving to the optimal spot.
+- Interceptions attribute helps defenders arrive first to clear.
+
+### 9.2 Header / Volley / Clearance Animations
+- Procedural header (directed / glancing / power), volley, and defensive clearance frames.
+- Timing window scales with Reactions and Heading / Volleying attributes.
+
+### 9.3 Rebound & Second-Ball Reflexes
+- Reflexes attribute shortens reaction time to deflections and loose balls in the box.
+- Higher difficulty AI wins a larger share of second balls.
+
+---
+
+## Phase 10: Live Player Rating Engine (SofaScore Model) & Match MVP
+*Priority: Zero-Allocation Live Analytics*  
+*Daily Token Budget Profile: Scope: `src/game/playerRatings.ts` (new), `src/game/engine.ts`, HUD components, EndGameModal | Target: ~700k tokens*
+
+### 10.1 Live Rating Core
+- Every player starts at 6.0.
+- Pre-allocated rating array; zero GC pressure.
+- Positive / negative event matrix (pass, dribble, shot, tackle, foul, card, goal, own-goal, clean-sheet contribution, etc.).
+- Human player’s live rating shown as a small floating badge (bottom-right, above controller).
+
+### 10.2 End-Game Board & MVP
+- Full team ratings list.
+- Highest-rated player receives Match MVP gold star treatment.
+- Subbed players’ ratings freeze at the moment of substitution.
+
+---
+
+## Phase 11: IFAB Linesman Offside Engine & VideoRef (VIR)
+*Priority: Law 11 Correctness + Lightweight Review Presentation*  
+*Daily Token Budget Profile: Scope: `src/game/engine.ts`, offside helpers, simple referee cut-scene | Target: ~650–750k tokens*
+
+### 11.1 Autonomous Assistant Referee
+- Two-player offside ray-cast (IFAB Law 11).
+- Correct exceptions (own half, ball played backward, throw-in, etc.).
+- Animated sideline linesman with flag.
+
+### 11.2 Toggleable VideoRef
+- Optional short referee-monitor style review for tight offside / penalty decisions.
+- Fully skippable; can be disabled in Graphics settings for performance.
+
+---
+
+## Phase 12: Lightweight Cinematics Suite & Slow-Mo Replay Buffer
+*Priority: Presentation Polish Without Performance Cost*  
+*Daily Token Budget Profile: Scope: circular frame buffer, simple cut-scene triggers | Target: ~700k tokens*
+
+### 12.1 Zero-Allocation Replay Ring Buffer
+- 300-frame circular buffer of essential state (player positions, ball, camera).
+- Automatic slow-mo on goals, penalties, red cards, tight offsides.
+- Instant any-key skip.
+
+### 12.2 Future Entrance Cinematic Hook (data only this phase)
+- Prepare data structures and timing hooks for a later “players walking onto the pitch” entrance using the larger captain models.
+- Do **not** implement the full cinematic yet; only the plumbing so a future phase can drop it in cleanly.
+
+---
+
+
+## Phase 13: Stadium Data Model & Lightweight Config Schema (Foundation)
+*Priority: Keep Stadium System Fully Data-Driven and Mobile-Light*  
+*Daily Token Budget Profile: Scope: new TypeScript interfaces in `src/types/stadium.ts` (or extend existing), stadium registry, team binding fields | Target: ~650–750k tokens*
+
+**Design principle**: Stadiums are pure configuration objects + procedural Canvas drawing. No meshes, no large textures, no per-frame allocation spikes. Everything is serialisable JSON so a stadium can be saved, loaded, and shared.
+
+### 13.1 Four Architectural Types (exact shape rules)
+1. **Round** (Maracanã / Estadio Olímpico style)
+   - Exactly 4 stands: North, South, West, East.
+   - Stands are curved and must visually join their neighbours.
+   - **Unique option**: optional athletics / running track surrounding the pitch (only Round and Oval support this).
+   - Produces a focused circular sunlight / floodlight pool with soft surrounding shadow.
+2. **Oval**
+   - Same 4 stands as Round, but the whole bowl is elongated (East/West stands are longer).
+   - Also supports the optional running track.
+   - Same focused circular light behaviour as Round.
+3. **Square**
+   - 8 stands: North, South, West, East + four corner stands (NW, NE, SW, SE).
+   - Main stands are straight; corners are independent and can be configured separately or omitted.
+4. **Rectangular**
+   - Same 8-stand layout as Square, but East and West stands are longer (classic European “box” stadium).
+
+### 13.2 Stand Configuration (shared vocabulary for all types)
+Every stand (main or corner) carries the following fields:
+
+**Tiers**
+- `tierCount`: 1 | 2 | 3 | 4  
+  **or** the special value `"wall"` (Dortmund-style single gigantic tier that occupies the visual height of a full 4-tier stand and forbids additional tiers).
+- Each individual tier has a size: `"small"` | `"medium"` | `"large"`.
+  - Size differences are linear: medium ≈ 1.5× small, large ≈ 2× small.
+  - When stacking tiers the stand height and capacity scale automatically.
+
+**Roof**
+- `roofStyle`: `"none"` | `"small"` | `"medium"` | `"large"`
+- `roofDesign`: 1 | 2 | 3 (three distinct silhouette variants)
+- `roofMaterial`: `"metal"` | `"concrete"` | `"translucent"` | `"canvas"`
+- `roofColor`: hex or named colour
+
+**Fence / Barrier**
+- `fenceType`: `"none"` | `"small"` | `"big"` | `"hugeSteel"` (South-American style tall steel fencing)
+
+**Stand Structure Colour** (concrete / cladding – separate from seats)
+- `standColorPrimary` / `standColorSecondary` (optional two-tone)
+
+**Corner-stand special rules (Square & Rectangular only)**
+- A corner can be:
+  - Full corner stand (same tier/roof/fence options as main stands)
+  - Simple column / pillar
+  - Plain wall
+  - Completely omitted (open corner)
+
+### 13.3 Seat Colour & Pattern System
+Seats are independent of stand structure colours.
+- `seatColors`: array of 1–4 colours
+- `seatPattern`:
+  - `"solid"` – single colour whole stadium
+  - `"perStand"` – each stand can have its own colour
+  - `"horizontalBands"` – 2 / 3 / 4 horizontal colour bands (lower / middle / upper)
+  - `"verticalStripes"` – continuous stripes running around the bowl
+  - `"lowerUpper"` – one colour lower tier(s), another colour upper tier(s)
+
+### 13.4 Track (Round & Oval only)
+- `hasTrack`: boolean
+- When true a running track is drawn around the pitch (classic Olympic / Maracanã look).
+- Track width and colour are fixed lightweight constants; only presence is configurable.
+- Square and Rectangular stadiums **must ignore** this flag.
+
+### 13.5 Lighting Model
+- `lightBanks`: number of floodlight groups (2 / 4 / 6 / 8)
+- `lightPower`: 0.0–1.0 (affects night brightness and shadow softness)
+- `lightFocus`: `"focused"` (Round/Oval default) | `"spread"` (Square/Rectangular default)
+- Day-time sunlight produces soft, non-obstructive shadows whose shape follows the stadium type (circular pool vs more rectangular shadow volumes).
+
+### 13.6 Team Binding Layer (per-team overrides)
+Each team stores:
+- `homeStadiumId` – reference into the global stadium registry
+- `stadiumDisplayName` – the name shown in menus and cinematics
+- `fanColors` – 1 to 4 colours worn by the crowd and used on banners
+- `bannerMessages` – exactly 4 short strings that appear on fan banners around the stadium
+- `sponsors` – ordered list of sponsor names/logos shown on electronic ad boards
+- `pitchPattern` – existing pitch designs (plain, vertical stripes, horizontal stripes, checkered, etc.)
+- `netStyle` – colour(s) and pattern of the goal nets (single colour, two-tone, vertical/horizontal stripes, club emblem style)
+- `pitchSizePreset` – `"small"` | `"medium"` | `"normal"` | `"large"` | `"wide"` | `"long"` | custom dimensions later
+
+### 13.7 Implementation Notes (token-efficient)
+- Create clean TypeScript interfaces only (`StadiumConfig`, `StandConfig`, `SeatConfig`, `LightingConfig`, `TeamStadiumOverrides`).
+- Ship 4–6 starter stadiums (one clean example of each architectural type + 1–2 variants).
+- No editor UI and no renderer yet – pure data layer so Phases 14 and 15 can consume it safely.
+- All numeric values pre-computed where possible; nothing allocated at runtime.
+
+---
+
+## Phase 14: Procedural Stadium Renderer & Match Integration
+*Priority: Draw Any Configured Stadium at Locked 60 FPS on Budget Phones*  
+*Daily Token Budget Profile: Scope: `src/game/stadiumRenderer.ts`, lighting/shadow helpers, integration into match start | Target: ~750–850k tokens*
+
+### 14.1 Procedural Drawing Pipeline
+Single Canvas 2D path that reads a `StadiumConfig` + `TeamStadiumOverrides` and draws, in order:
+1. Pitch (size + pattern from team overrides)
+2. Optional running track (only if `hasTrack === true` and type is Round or Oval)
+3. Four or eight stands with correct curvature / straightness according to architectural type
+4. Tier stacking (height and depth calculated from tierCount + sizes; “wall” treated as special max-height single tier)
+5. Roofs (silhouette from roofStyle + roofDesign, coloured by roofMaterial/roofColor)
+6. Fences
+7. Seats (pattern applied according to seatPattern and seatColors)
+8. Floodlight banks and their glow
+9. Soft day/night shadows (shape dictated by stadium type – circular pool for Round/Oval, more angular for Square/Rectangular)
+10. Fan banners (4 messages) and electronic ad boards (sponsors)
+11. Crowd colour wash using the team’s fanColors
+
+### 14.2 Tier, Roof, Seat & Track Rendering Rules (concrete)
+- **Tiers**: each successive tier is drawn higher and slightly set back; capacity estimate is derived from tier sizes for UI display only.
+- **Wall tier**: rendered as one continuous massive stand face; no upper tiers allowed.
+- **Roofs**: three silhouette variants (flat cantilever, curved shell, multi-panel) scaled by small/medium/large.
+- **Seats**: pixel-level or simple rect fills following the chosen pattern; never per-seat sprites.
+- **Track**: simple concentric oval/round band with lane lines; completely omitted for Square/Rectangular.
+
+### 14.3 Performance Contract
+- All geometry and path data generated once at match start (or when stadium is first previewed) and cached.
+- Zero path allocation inside the 60 FPS game loop.
+- Graphics quality preset can:
+  - Disable soft shadows
+  - Reduce stand detail (flatten upper tiers)
+  - Skip banner text
+- Night matches simply raise floodlight intensity and darken the ambient.
+
+### 14.4 Live Match Binding
+When a match begins the engine loads:
+- the referenced `StadiumConfig`
+- the home (and optionally away) team’s overrides
+- applies pitch size, net style, banners, sponsors and fan colours automatically.
+
+---
+
+## Phase 15: Stadium Creator UI & Team Assignment
+*Priority: Deep but Still Single-Screen 32-Bit Console Editor*  
+*Daily Token Budget Profile: Scope: `StadiumCreatorModal` (new or extend existing StadiumSelectorModal), team editor hooks, live miniature preview | Target: ~750–850k tokens*
+
+### 15.1 Creator Entry & Type Selection
+- First screen: choose architectural type (Round / Oval / Square / Rectangular) with a small silhouette icon for each.
+- Immediately after type selection the appropriate stand list appears (4 stands for Round/Oval, 8 for Square/Rectangular).
+
+### 15.2 Stand Editor (Zero-Scroll Console Panels)
+For each stand the user can set, without scrolling:
+- Tier mode: 1 / 2 / 3 / 4 tiers **or** Wall
+- Size of each active tier (Small / Medium / Large)
+- Roof: style + design variant + material + colour
+- Fence type
+- Stand structure colour(s)
+- (Corners only) Full stand / Column / Wall / None
+
+Live miniature preview updates instantly using the same procedural renderer from Phase 14.
+
+### 15.3 Global Stadium Options
+- Track toggle (visible and enabled **only** when type is Round or Oval; hidden otherwise)
+- Lighting: number of banks + power slider
+- Overall capacity estimate (read-only, derived from tiers)
+
+### 15.4 Seat Colour & Pattern Panel
+- Pick 1–4 colours
+- Choose pattern (solid / per-stand / horizontal bands / vertical stripes / lower-upper)
+- When “per-stand” is selected, each stand gets its own colour picker
+
+### 15.5 Save & Registry
+- Name the stadium configuration
+- Save into the global stadium registry (persisted)
+- Newly created stadiums become available for any team to select as home
+
+### 15.6 Team-Side Customisation (from team / captain menu)
+- Assign any registered stadium as the team’s home stadium
+- Override display name
+- Set 1–4 fan colours (crowd + banners)
+- Write the 4 banner messages
+- Manage sponsor list (ad boards)
+- Choose pitch pattern, net style/colour, and pitch size preset
+
+### 15.7 Preview Contract
+- The exact same procedural renderer used in live matches powers the creator preview and the team assignment preview (“what you see is what you get”).
+- All controls remain single-screen, 32-bit bevelled console style, zero scrolling on mobile.
+
+---
+
+## Master Development Execution Order (Updated)
+
+| Phase | Title | Focus | Status / Notes |
 | :---: | :--- | :--- | :--- |
-| **Phase 0** | **32-Bit UI, Zero-Scroll Game Plan, Broadcast HUD & Device Profiling** | Architecture & UI | [COMPLETED] Zero-scroll single screen pitch in Game Plan on PC & mobile; 32-bit styling overhaul; custom formation builder with $\ge 2$ DEF, $\ge 2$ MID, $\ge 1$ ATT validation & confirm blocking; removal of gameplay top buttons with only Scoreboard (left) and Drawstar TV (right); camera center offset above solid touch controller; startup hardware profiler (keyboard/gamepad mapping vs touch, graphics preset suggestion); all 7 Special Teams starting XI, substitutes, formations & playstyles synced. |
-| **Phase 1** | **Match Regulation Halves, Stoppage Time, Whistle AI & End-Game Hub** | Match Regulation Flow | Two 45m halves; away kickoff 1st half, home kickoff 2nd half; dynamic stoppage time (+1m min in 1st half, +2m min in 2nd half, +30s per sub/injury in 1m batches); non-dangerous ending whistle AI (box possession delay, penalty must-take, 70/30 corners/freekicks); Halftime pause hub; End-Game victory hub with Rematch, Team Selection, Settings, Extra Time & Penalties for draws. |
-| **Phase 2** | **Live Player Rating Engine (SofaScore Model) & Match MVP** | Analytics & HUD | Live 6.0 baseline rating; bottom-right floating badge above controller; comprehensive positive/negative events matrix (passes, dribbles, shots, goals, tackles, cards, own goals, clean sheet penalties); subbed-out rating freeze; end-game ratings board with MVP star. |
-| **Phase 3** | **IFAB Linesman Offside Engine & VideoRef (VIR / VAR)** | Rules & Technology | IFAB Law 11 2-player offside raycasting; proper exceptions (own half, behind ball, throw-in); animated sideline linesman with checkered flag; VideoRef (VIR) toggleable review system with referee monitor cutscene. |
-| **Phase 4** | **Lightweight Cinematics Suite & Slow-Mo Replay Engine** | Presentation & Replays | Zero-allocation circular ring buffer for 300 frames; automatic goal, foul, penalty & offside slow-mo replays with instant any-key skip; entrance, celebration & card cutscenes; toggleable in graphics settings for budget devices. |
-| **Phase 5** | **Goalkeeper Mechanical Mastery & Dual Control/AI Architecture** | Goalkeeping Engine | Symmetrical GK AI; catch-slip vs. punch mechanics; star spread 1v1 block; high/low dives; procedural GK sprites. |
-| **Phase 6** | **Modern Compact Positioning & 5-Tier AI** | Tactical AI | Modern vertical compactness; line intermingling; high press vs. low block; elimination of repetitive back passes; stats-based passing precision. |
-| **Phase 7** | **Extended Ball Flight & Clean Tackling** | Physics & Defending | 90% power shots from 3/4 pitch reach goal; "Cambio de Frente" cross-field switches; clean tackling AI without excessive fouls. |
-| **Phase 8** | **Dribbling Animation Tiers & Ginga Revamp** | Locomotion & Skills | 6-tier procedural dribbling animations; on-ball acceleration scaling; stepovers; Ginga 70+ attribute threshold. |
-| **Phase 9** | **Aerial Anticipation, Headers & Volleys** | Aerial Gameplay | Drop-zone trajectory reading; positioning/interceptions anticipation; rebound reflexes; acrobatic headers and volleys. |
-| **Phase 10** | **Modular Stadium Creator & Engine Preview** | Atmosphere & Stadiums | 4 stadium types (Round, Square, Rectangular, Oval); tier stacking (1–4 tiers + Wall); roof & fence styles; team banners, sponsors & crowd colors. |
+| **0** | 32-Bit UI, Zero-Scroll Game Plan, Broadcast HUD & Device Profiling | Architecture & UI | **COMPLETED** |
+| **1** | Match Regulation Halves, Stoppage Time, Whistle AI & End-Game Hub | Match Flow | **COMPLETED** |
+| **2** | Startup Flow, Captain Menu, Difficulty Tiers (5), Game Plan Load Fix | Entry Point & Settings | NEXT |
+| **3** | Goalkeeper Mechanical Mastery & Dual Control/AI | Goalkeeping | |
+| **4** | Modern Compact Positioning Foundation (AI Part 1) | AI Positioning | Dedicated AI |
+| **5** | Advanced Positioning, Line Intermingling & Role Fluidity (AI Part 2) | AI Positioning | Dedicated AI |
+| **6** | AI Decision Quality, Passing Logic, Clean Defending | AI Decisions | |
+| **7** | Long-Range Ball Flight & Cambio de Frente | Physics | |
+| **8** | Dribbling Animation Tiers, On-Ball Accel, Ginga | Locomotion | |
+| **9** | Aerial Anticipation, Headers, Volleys | Aerial | |
+| **10** | Live Player Rating Engine & Match MVP | Analytics | |
+| **11** | IFAB Linesman Offside & VideoRef | Rules | |
+| **12** | Lightweight Cinematics & Replay Buffer | Presentation | |
+| **13** | Stadium Data Model & Config Schema (tiers, roofs, seats, track rules) | Stadium Foundation | Expanded |
+| **14** | Procedural Stadium Renderer & Match Integration | Stadium Render | Expanded |
+| **15** | Stadium Creator UI & Team Assignment | Stadium Editor | Expanded |
+
+---
+
+**Token Discipline Reminder**  
+Every phase is deliberately scoped to one focused Google AI Studio free-tier day. Each phase ends with a compilable, playable build. Prefer extending existing zero-allocation systems over introducing new heavy abstractions. Mobile 60 FPS and single-screen 32-bit UI remain non-negotiable constraints for every change.
+
